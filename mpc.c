@@ -344,16 +344,16 @@ static char mpc_input_getc(mpc_input_t *i) {
   switch (i->type) {
     
     case MPC_INPUT_STRING: return i->string[i->state.pos];
-    case MPC_INPUT_FILE: c = fgetc(i->file); return c;
+    case MPC_INPUT_FILE: c = (char)(fgetc(i->file)); return c;
     case MPC_INPUT_PIPE:
     
-      if (!i->buffer) { c = getc(i->file); return c; }
+      if (!i->buffer) { c = (char)(getc(i->file)); return c; }
       
       if (i->buffer && mpc_input_buffer_in_range(i)) {
         c = mpc_input_buffer_get(i);
         return c;
       } else {
-        c = getc(i->file);
+        c = (char)(getc(i->file));
         return c;
       }
     
@@ -369,7 +369,7 @@ static char mpc_input_peekc(mpc_input_t *i) {
     case MPC_INPUT_STRING: return i->string[i->state.pos];
     case MPC_INPUT_FILE: 
       
-      c = fgetc(i->file);
+      c = (char)(fgetc(i->file));
       if (feof(i->file)) { return '\0'; }
       
       fseek(i->file, -1, SEEK_CUR);
@@ -378,7 +378,7 @@ static char mpc_input_peekc(mpc_input_t *i) {
     case MPC_INPUT_PIPE:
       
       if (!i->buffer) {
-        c = getc(i->file);
+        c = (char)(getc(i->file));
         if (feof(i->file)) { return '\0'; }
         ungetc(c, i->file);
         return c;
@@ -387,7 +387,7 @@ static char mpc_input_peekc(mpc_input_t *i) {
       if (i->buffer && mpc_input_buffer_in_range(i)) {
         return mpc_input_buffer_get(i);
       } else {
-        c = getc(i->file);
+        c = (char)(getc(i->file));
         if (feof(i->file)) { return '\0'; }
         ungetc(c, i->file);
         return c;
@@ -1193,7 +1193,7 @@ static int mpc_parse_run(mpc_input_t *i, mpc_parser_t *p, mpc_result_t *r, mpc_e
       MPC_FAILURE(mpc_err_fail(i, "Unknown Parser Type Id!"));
   }
   
-  return 0;
+  //return 0;
   
 }
 
@@ -2095,7 +2095,7 @@ static mpc_val_t *mpcf_re_range(mpc_val_t *x) {
         for (j = start; j <= end; j++) {
           range = realloc(range, strlen(range) + 1 + 1 + 1);
           range[strlen(range) + 1] = '\0';
-          range[strlen(range) + 0] = j;
+          range[strlen(range) + 0] = (char)j;
         }        
       }
     }
@@ -2217,7 +2217,7 @@ mpc_val_t *mpcf_oct(mpc_val_t *x) {
 
 mpc_val_t *mpcf_float(mpc_val_t *x) {
   float *y = malloc(sizeof(float));
-  *y = strtod(x, NULL);
+  *y = (float)strtod(x, NULL);
   free(x);
   return y;
 }
